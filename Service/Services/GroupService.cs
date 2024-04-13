@@ -1,0 +1,77 @@
+﻿using Repository.Data;
+using Domain.Models;
+using Microsoft.EntityFrameworkCore;
+using Service.Services.Interfaces;
+
+
+namespace Service.Services
+{
+    internal class GroupService
+    {
+        private readonly AppDbContext _context;
+        private int count = 1;
+        public GroupService()
+        {
+            _context = new AppDbContext();
+        }
+
+        public async Task Create(Group group)
+        {
+            await _context.Groups.AddAsync(group);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task Delete(int? id)
+        {
+            if (id is null) throw new ArgumentNullException(nameof(id));
+            var data = _context.Groups.FirstOrDefault(g => g.Id == id);
+            if (data is null) throw new ArgumentNullException("Data not found");
+            _context.Groups.Remove(data);
+            await _context.SaveChangesAsync();
+
+        }
+
+        public async Task<List<Group>> GetAllAsync()
+        {
+            return await _context.Groups.ToListAsync();
+        }
+
+        public async Task<List<Group>> FilterByEducationName(string eduName)
+        {
+            var datas = _context.Groups.Where(g => g.Education.Name == eduName).ToList();
+            if (datas is null) throw new ArgumentNullException("Data not found");
+            return datas;
+        }
+        public async Task<List<Group>> GetAllWithEducationId(int id)
+        {
+            var datas = _context.Groups.Where(g => g.EducationId == id).ToList();
+            if (datas is null) throw new ArgumentNullException("Data not found");
+            return datas;
+        }
+
+        public async Task<Group> GetById(int id)
+        {
+            var data = _context.Groups.FirstOrDefault(g => g.Id == id);
+            if (data is null) throw new ArgumentNullException("Data not found");
+            return data;
+        }
+
+        public async Task<Group> GetByName(string groupName)
+        {
+            var data = _context.Groups.FirstOrDefault(g => g.Name == groupName);
+            if (data is null) throw new ArgumentNullException("Data not found");
+            return data;
+        }
+
+        public async Task Update(Group group)
+        {
+            var data = _context.Groups.FirstOrDefault(g => g.Id == group.Id);
+            if (data is null) throw new ArgumentNullException("Data not found");
+            data.Name = group.Name;
+            data.Capacity = group.Capacity;
+            data.EducationId = group.EducationId;
+            data.Education = data.Education;
+            await _context.SaveChangesAsync();
+        }
+    }
+}
