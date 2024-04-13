@@ -6,7 +6,7 @@ using Service.Services.Interfaces;
 
 namespace Service.Services
 {
-    internal class GroupService
+    public class GroupService : IGroupService
     {
         private readonly AppDbContext _context;
         private int count = 1;
@@ -56,13 +56,6 @@ namespace Service.Services
             return data;
         }
 
-        public async Task<Group> GetByName(string groupName)
-        {
-            var data = _context.Groups.FirstOrDefault(g => g.Name == groupName);
-            if (data is null) throw new ArgumentNullException("Data not found");
-            return data;
-        }
-
         public async Task Update(Group group)
         {
             var data = _context.Groups.FirstOrDefault(g => g.Id == group.Id);
@@ -72,6 +65,19 @@ namespace Service.Services
             data.EducationId = group.EducationId;
             data.Education = data.Education;
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Group>> Search(string name)
+        {
+            var datas = await _context.Groups.Where(g => g.Name == name).ToListAsync();
+            if (datas is null) throw new ArgumentNullException("Data not found");
+            return datas;
+        }
+
+        public async Task<List<Group>> SortWithCapacity()
+        {
+            var datas = await _context.Groups.OrderByDescending(g => g.Capacity).ToListAsync();
+            return datas;
         }
     }
 }
