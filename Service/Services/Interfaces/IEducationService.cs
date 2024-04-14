@@ -8,7 +8,7 @@ namespace Service.Services.Interfaces
         Task Delete(int? id);
         Task Update(Education education,int id);
         Task<List<Education>> GetAll();
-        List<Education> GetAllForMethods();
+        List<Education> GetAllForMethods();//For Controller
         Task<Education> GetById(int id);
         Task<List<Education>> Search(string name);
         Task GetAllWithGroups();

@@ -21,10 +21,18 @@ namespace EducationApp.Controllers
         Group:
             Console.WriteLine("Add Name:");
             string name = Console.ReadLine();
-
+            var datas = await _groupService.GetAllAsync();
+            foreach (var item in datas)
+            {
+                if (item.Name == name)
+                {
+                    ConsoleColor.Red.WriteConsole("Already exist group name!!!");
+                    goto Group;
+                }
+            }
             if (string.IsNullOrWhiteSpace(name) || !name.All(char.IsLetter))
             {
-                ConsoleColor.Red.WriteConsole("Education Name format is wrong!!!");
+                ConsoleColor.Red.WriteConsole("Group Name format is wrong!!!");
                 goto Group;
             }
 
@@ -82,17 +90,67 @@ namespace EducationApp.Controllers
         }
         public async Task Delete()
         {
-            Console.WriteLine("Enter Group Id");
-            int id = Convert.ToInt32(Console.ReadLine());
-            try
+            var datas = _groupService.GetAllForMethods();
+            foreach (var item in datas)
             {
-                await _groupService.Delete(id);
-                ConsoleColor.Green.WriteConsole("Data Deleted");
+                string data = $"Id : {item.Id}, Name: {item.Name}";
+                Console.WriteLine(data);
             }
-            catch (Exception ex)
+            int groupId;
+            bool isValidId = false;
+            
+            do
             {
-                ConsoleColor.Red.WriteConsole(ex.Message);
-            }
+                
+                Console.WriteLine("Enter Group Id:");
+                string idInput = Console.ReadLine();
+
+                if (int.TryParse(idInput, out groupId))
+                {
+                    isValidId = true;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid number for the ID.");
+                }
+            } while (!isValidId);
+            string confirmation;
+            do
+            {
+                Console.WriteLine("Are you sure you want to delete this group? (YES/NO)");
+                confirmation = Console.ReadLine().ToUpper();
+                if (confirmation == "YES")
+                {
+                    try
+                    {
+                        await _groupService.Delete(groupId);
+                        Console.WriteLine("Data Deleted");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    break;
+                }
+                else if (confirmation == "NO")
+                {
+                    Console.WriteLine("Deletion cancelled.");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter 'YES' or 'NO'.");
+                }
+            } while (true);
+            //try
+            //{
+            //    await _groupService.Delete(id);
+            //    ConsoleColor.Green.WriteConsole("Data Deleted");
+            //}
+            //catch (Exception ex)
+            //{
+            //    ConsoleColor.Red.WriteConsole(ex.Message);
+            //}
         }
         public async Task Update()
         {
@@ -105,7 +163,6 @@ namespace EducationApp.Controllers
                 string name = Console.ReadLine();
 
                 Console.WriteLine("Enter Capasity:");
-                //string capStr=Console.ReadLine();
                 int capasity = Convert.ToInt32(Console.ReadLine());
 
                 Console.WriteLine("Enter Education Id:");
@@ -128,15 +185,15 @@ namespace EducationApp.Controllers
         }
         public async Task GetAllAsync()
         {
-            var eduDatas = await _educationService.GetAll();
-            var datas = await _groupService.GetAllAsync();
+            var eduDatas = _educationService.GetAllForMethods();
+            var datas =  _groupService.GetAllForMethods();
             foreach (var item in datas)
             {
                 foreach (var edu in eduDatas)
                 {
                     if (item.EducationId == edu.Id)
                     {
-                        string data = $"Name : {item.Name}, Capasity : {item.Capacity}, Education : {edu.Name}";
+                        string data = $"Id : {item.Id}, Name : {item.Name}, Capasity : {item.Capacity}, Education : {edu.Name}";
                         Console.WriteLine(data);
                     }
                 }
@@ -154,7 +211,7 @@ namespace EducationApp.Controllers
                 {
                     if (item.Id == data.EducationId)
                     {
-                        string result = $"Name : {data.Name}, Capasity : {data.Capacity}, Education : {item.Name}";
+                        string result = $"Id : {item.Id}, Name : {data.Name}, Capasity : {data.Capacity}, Education : {item.Name}";
                         Console.WriteLine(result);
                     }
                 }
@@ -167,13 +224,14 @@ namespace EducationApp.Controllers
         }
         public async Task Search()
         {
-            Console.WriteLine("Write Group Name:");
+            Console.WriteLine("Enter input to search");
             string name = Console.ReadLine();
+
             var datas = await _groupService.Search(name);
 
             foreach (var item in datas)
             {
-                string data = $"Name : {item.Name}, Capasity : {item.Capacity}, Education : {item.Education.Name}";
+                string data = $"Id : {item.Id}, Name : {item.Name}, Color :  {item.Capacity} , Created Date :  {item.CreatedTime}";
                 Console.WriteLine(data);
             }
         }
@@ -182,10 +240,17 @@ namespace EducationApp.Controllers
             Console.WriteLine("Enter Education Name:");
             string eduName = Console.ReadLine();
             var datas = await _groupService.FilterByEducationName(eduName);
+            var eduDatas = _educationService.GetAllForMethods();
             foreach (var item in datas)
             {
-                string data = $"Name : {item.Name}, Capasity : {item.Capacity}, Education : {item.Education.Name}";
-                Console.WriteLine(data);
+                foreach (var edu in eduDatas)
+                {
+                    if (item.EducationId == edu.Id)
+                    {
+                        string data = $"Id : {item.Id}, Name : {item.Name}, Capasity : {item.Capacity}, Education : {edu.Name}";
+                        Console.WriteLine(data);
+                    }
+                }
             }
         }
         public async Task GetAllWithEducationId()
@@ -195,18 +260,25 @@ namespace EducationApp.Controllers
             var datas = await _groupService.GetAllWithEducationId(id);
             foreach (var item in datas)
             {
-                string data = $"Name : {item.Name}, Capasity : {item.Capacity}, Education : {item.Education.Name}";
+                string data = $"Id : {item.Id}, Name : {item.Name}, Capasity : {item.Capacity}, Education : {item.EducationId}";
                 Console.WriteLine(data);
             }
         }
         public async Task SortWithCapacity()
         {
             Console.WriteLine("Sorted Groups:");
+            var eduDatas = _educationService.GetAllForMethods();
             var datas = await _groupService.SortWithCapacity();
             foreach (var item in datas)
             {
-                string data = $"Name : {item.Name}, Capasity : {item.Capacity}, Education : {item.Education.Name}";
-                Console.WriteLine(data);
+                foreach (var edu in eduDatas)
+                {
+                    if (item.EducationId == edu.Id)
+                    {
+                        string data = $"Id : {item.Id}, Name : {item.Name}, Capasity : {item.Capacity}, Education : {edu.Name}";
+                        Console.WriteLine(data);
+                    }
+                }
             }
         }
 

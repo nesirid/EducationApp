@@ -2,6 +2,7 @@
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Service.Services.Interfaces;
+using Service.Helpers.Extentions;
 
 
 namespace Service.Services
@@ -36,6 +37,10 @@ namespace Service.Services
             return await _context.Groups.ToListAsync();
         }
 
+        public List<Group> GetAllForMethods()
+        {
+            return  _context.Groups.ToList();
+        }
         public async Task<List<Group>> FilterByEducationName(string eduName)
         {
             var datas = _context.Groups.Where(g => g.Education.Name == eduName).ToList();
@@ -69,8 +74,11 @@ namespace Service.Services
 
         public async Task<List<Group>> Search(string name)
         {
-            var datas = await _context.Groups.Where(g => g.Name == name).ToListAsync();
-            if (datas is null) throw new ArgumentNullException("Data not found");
+            var datas = await _context.Groups.Where(e => e.Name.Contains(name)).ToListAsync();
+            if (datas.Count == 0)
+            {
+                ConsoleColor.Red.WriteConsole("Data not found");
+            }
             return datas;
         }
 

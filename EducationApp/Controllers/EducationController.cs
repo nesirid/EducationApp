@@ -25,6 +25,15 @@ namespace EducationApp.Controllers
         {
         Edu: Console.WriteLine("Add Education Name:");
             string eduName = Console.ReadLine();
+            var datas = await _educationService.GetAll();
+            foreach (var item in datas)
+            {
+                if (item.Name == eduName)
+                {
+                    ConsoleColor.Red.WriteConsole("Already exist education name!!!");
+                    goto Edu;
+                }
+            }
 
             Console.WriteLine("Add Education Color:");
             string eduColor = Console.ReadLine();
@@ -53,7 +62,6 @@ namespace EducationApp.Controllers
             {
                 Console.WriteLine("Enter Education Id (a number):");
                 string idInput = Console.ReadLine();
-
 
                 if (int.TryParse(idInput, out id))
                 {
