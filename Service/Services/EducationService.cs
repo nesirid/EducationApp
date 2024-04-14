@@ -1,6 +1,7 @@
 ﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
+using Service.Helpers.Extentions;
 using Service.Services.Interfaces;
 
 namespace Service.Services
@@ -24,8 +25,11 @@ namespace Service.Services
             if (id is null) throw new ArgumentNullException(nameof(id));
             var data = _context.Educations.FirstOrDefault(e => e.Id == id);
             if (data is null) throw new ArgumentNullException("Data not found");
-            _context.Educations.Remove(data);
-            await _context.SaveChangesAsync();
+            else
+            {
+                _context.Educations.Remove(data);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<List<Education>> GetAll()
@@ -43,7 +47,7 @@ namespace Service.Services
         public async Task GetAllWithGroups()
         {
             var groupDatas = await _context.Groups.ToListAsync();
-            
+
             var educationDatas = await _context.Educations.ToListAsync();
             foreach (var edu in educationDatas)
             {
@@ -51,7 +55,7 @@ namespace Service.Services
                 Console.WriteLine($"{edu.Name}'s Groups");
                 foreach (var gr in groupDatas)
                 {
-                    Console.WriteLine(await _context.Groups.FirstOrDefaultAsync(g=>g.EducationId==edu.Id));
+                    Console.WriteLine(await _context.Groups.FirstOrDefaultAsync(g => g.EducationId == edu.Id));
                     //var datas = await _context.Groups.Where(g => g.EducationId == edu.Id).ToListAsync();
                 }
             }
@@ -59,8 +63,11 @@ namespace Service.Services
 
         public async Task<List<Education>> Search(string name)
         {
-            var datas = await _context.Educations.Where(e => e.Name == name).ToListAsync();
-            if (datas is null) throw new ArgumentNullException("Data not found");
+            var datas = await _context.Educations.Where(e => e.Name.Contains(name)).ToListAsync();
+            if (datas.Count == 0)
+            {
+                ConsoleColor.Red.WriteConsole("Data not found");
+            }
             return datas;
         }
 
@@ -70,13 +77,18 @@ namespace Service.Services
             return datas;
         }
 
-        public async Task Update(Education education)
+        public async Task Update(Education education,int id)
         {
-            var data = _context.Educations.FirstOrDefault(g => g.Id == education.Id);
+            var data = await _context.Educations.FirstOrDefaultAsync(g => g.Id == id);
             if (data is null) throw new ArgumentNullException("Data not found");
             data.Name = education.Name;
             data.Color = education.Color;
+            data.CreatedTime = DateTime.Now;
             await _context.SaveChangesAsync();
+        }
+        public List<Education> GetAllForMethods()
+        {
+            return _context.Educations.ToList();
         }
 
     }

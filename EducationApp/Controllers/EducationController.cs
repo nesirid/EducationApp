@@ -1,64 +1,135 @@
 ﻿using Service.Services.Interfaces;
 using Service.Services;
 using Domain.Models;
+using Repository.Data;
+using Service.Helpers.Extentions;
+using Microsoft.EntityFrameworkCore;
 
 namespace EducationApp.Controllers
 {
     internal class EducationController
     {
         private readonly IEducationService _educationService;
+        private readonly IGroupService _groupService;
+        private readonly AppDbContext _context;
+
+
         public EducationController()
         {
             _educationService = new EducationService();
+            _groupService = new GroupService();
+            _context = new AppDbContext();
         }
 
         public async Task Create()
         {
-            Console.WriteLine("Add Education Name:");
+        Edu: Console.WriteLine("Add Education Name:");
             string eduName = Console.ReadLine();
 
             Console.WriteLine("Add Education Color:");
             string eduColor = Console.ReadLine();
 
-            await _educationService.Create(new Education { Name = eduName, Color = eduColor, CreatedTime = DateTime.UtcNow });
+            if (string.IsNullOrWhiteSpace(eduName) || !eduName.All(char.IsLetter)
+                || string.IsNullOrWhiteSpace(eduColor) || !eduColor.All(char.IsLetter))
+            {
+                ConsoleColor.Red.WriteConsole("Education Name format is wrong!!!");
+                goto Edu;
+            }
 
+            _educationService.Create(new Education { Name = eduName, Color = eduColor, CreatedTime = DateTime.Now });
+            ConsoleColor.Green.WriteConsole("Created Education Successfuly");
         }
         public async Task Delete()
         {
-            Console.WriteLine("Enter Education Id");
-            int id = Convert.ToInt32(Console.ReadLine());
-            try
+            var eduDatas = _educationService.GetAllForMethods();
+            foreach (var item in eduDatas)
             {
-                await _educationService.Delete(id);
-                Console.WriteLine("Data Deleted");
+                string data = $"Id : {item.Id}  Name : {item.Name}";
+                Console.WriteLine(data);
             }
-            catch (Exception ex)
+            int id;
+            bool isValidId = false;
+            do
             {
-                Console.WriteLine(ex.Message);
-            }
+                Console.WriteLine("Enter Education Id (a number):");
+                string idInput = Console.ReadLine();
+
+
+                if (int.TryParse(idInput, out id))
+                {
+                    isValidId = true;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid number for the ID.");
+                }
+            } while (!isValidId);
+            string confirmation;
+            do
+            {
+                Console.WriteLine("Are you sure you want to delete this education? (YES/NO)");
+                confirmation = Console.ReadLine().ToUpper();
+                if (confirmation == "YES")
+                {
+                    try
+                    {
+                        await _educationService.Delete(id);
+                        Console.WriteLine("Data Deleted");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    break;
+                }
+                else if (confirmation == "NO")
+                {
+                    Console.WriteLine("Deletion cancelled.");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter 'YES' or 'NO'.");
+                }
+            } while (true);
         }
         public async Task GetAll()
         {
-            var datas = await _educationService.GetAll();
+            var datas = _educationService.GetAllForMethods();
             foreach (var item in datas)
             {
-                string data = $"Name : {item.Name}, Color : {item.Color}, Created Date : {item.CreatedTime}";
+                string data = $"Id : {item.Id} Name : {item.Name}, Color : {item.Color}, Created Date : {item.CreatedTime}";
                 Console.WriteLine(data);
             }
         }
         public async Task GetById()
         {
-            Console.WriteLine("Write Education Id:");
-            int id = Convert.ToInt32(Console.ReadLine());
+            int id;
+            bool isValidId = false;
+            do
+            {
+                Console.WriteLine("Write Education Id:");
+                string idInput = Console.ReadLine();
+
+                if (int.TryParse(idInput, out id))
+                {
+                    isValidId = true;
+                }
+                else
+                {
+                    ConsoleColor.Red.WriteConsole("Invalid input. Please enter a valid number for the ID.");
+                }
+            } while (!isValidId);
+
             try
             {
                 var data = await _educationService.GetById(id);
-                string result = $"Name : {data.Name}, Color : {data.Color}, Created Date : {data.CreatedTime}";
+                string result = $"Id : {data.Id} Name : {data.Name}, Color : {data.Color}, Created Date : {data.CreatedTime}";
                 Console.WriteLine(result);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                ConsoleColor.Red.WriteConsole(ex.Message);
             }
         }
         public async Task GetAllWithGroups()
@@ -89,29 +160,56 @@ namespace EducationApp.Controllers
         }
         public async Task Update()
         {
-            Console.WriteLine("Enter Education Id:");
-            int id = Convert.ToInt32(Console.ReadLine());
-            try
+            var eduDatas = _educationService.GetAllForMethods();
+            foreach (var item in eduDatas)
             {
-                var data = await _educationService.GetById(id);
-                Console.WriteLine("Enter Name:");
-                string name = Console.ReadLine();
-
-                Console.WriteLine("Enter Color:");
-                //string capStr=Console.ReadLine();
-                string color = Console.ReadLine();
-
-                var updatedEducation = new Education
-                {
-                    Id = data.Id,
-                    Name = name,
-                    Color = color
-                };
-                await _educationService.Update(updatedEducation);
+                string data = $"Id : {item.Id}  Name : {item.Name}, Color : {item.Color}";
+                Console.WriteLine(data);
             }
-            catch (Exception ex)
+            int id;
+            bool isValidId = false;
+            do
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("Enter Education Id (a number):");
+                string idInput = Console.ReadLine();
+
+
+                if (int.TryParse(idInput, out id))
+                {
+                    isValidId = true;
+                }
+                else
+                {
+                    ConsoleColor.Red.WriteConsole("Invalid input. Please enter a valid number for the ID.");
+                }
+            } while (!isValidId);
+            var existEdu = await _context.Educations.FirstOrDefaultAsync(g => g.Id == id);
+            if (existEdu == null)
+            {
+                ConsoleColor.Red.WriteConsole("Invalid input. Please enter a valid number for the ID.");
+            }
+            else
+            {
+                try
+                {
+                    Console.WriteLine("Enter Name:");
+                    string name = Console.ReadLine();
+
+                    Console.WriteLine("Enter Color:");
+                    string color = Console.ReadLine();
+
+                    Education newEdu = new Education
+                    {
+                        Name = name,
+                        Color = color
+                    };
+
+                    await _educationService.Update(newEdu, id);
+                }
+                catch (Exception ex)
+                {
+                    ConsoleColor.Red.WriteConsole(ex.Message);
+                }
             }
         }
     }

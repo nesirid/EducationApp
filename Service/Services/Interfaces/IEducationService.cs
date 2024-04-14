@@ -6,8 +6,9 @@ namespace Service.Services.Interfaces
     {
         Task Create(Education education);
         Task Delete(int? id);
-        Task Update(Education education);
+        Task Update(Education education,int id);
         Task<List<Education>> GetAll();
+        List<Education> GetAllForMethods();
         Task<Education> GetById(int id);
         Task<List<Education>> Search(string name);
         Task GetAllWithGroups();

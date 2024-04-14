@@ -8,26 +8,77 @@ namespace EducationApp.Controllers
     internal class GroupController
     {
         private readonly IGroupService _groupService;
+        private readonly IEducationService _educationService;
+
         public GroupController()
         {
             _groupService = new GroupService();
+            _educationService = new EducationService();
         }
 
         public async Task Create()
         {
+        Group:
             Console.WriteLine("Add Name:");
             string name = Console.ReadLine();
 
-            Console.WriteLine("Add Capasity:");
-            //string capStr=Console.ReadLine();
-            int capasity = Convert.ToInt32(Console.ReadLine());
+            if (string.IsNullOrWhiteSpace(name) || !name.All(char.IsLetter))
+            {
+                ConsoleColor.Red.WriteConsole("Education Name format is wrong!!!");
+                goto Group;
+            }
 
-            Console.WriteLine("Add Education Id:");
-            int educationId = Convert.ToInt32(Console.ReadLine());
+            int capacity;
+            bool isValidCapacity = false;
+            do
+            {
+                Console.WriteLine("Add Capacity:");
+                string capacityInput = Console.ReadLine();
 
+                if (int.TryParse(capacityInput, out capacity))
+                {
+                    isValidCapacity = true;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid number for the capacity.");
+                }
+            } while (!isValidCapacity);
 
-            await _groupService.Create(new Group { Name = name, Capacity = capasity, EducationId = educationId, CreatedTime = DateTime.UtcNow });
-            ConsoleColor.Green.WriteConsole("Created Succesfully");       
+            var eduDatas = _educationService.GetAllForMethods();
+            foreach (var item in eduDatas)
+            {
+                string data = $"Id : {item.Id}  Name : {item.Name}";
+                Console.WriteLine(data);
+            }
+
+            int educationId;
+            bool isValidEducationId = false;
+            do
+            {
+                Console.WriteLine("Add Education Id:");
+                string educationIdInput = Console.ReadLine();
+
+                if (int.TryParse(educationIdInput, out educationId))
+                {
+                    //var eduDatas = _educationService.GetAllForMethods();
+                    if (eduDatas.Any(edu => edu.Id == educationId))
+                    {
+                        isValidEducationId = true;
+                    }
+                    else
+                    {
+                        ConsoleColor.Red.WriteConsole("Invalid Education Id. Please enter an existing Education Id.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid number for the Education Id.");
+                }
+            } while (!isValidEducationId);
+
+            await _groupService.Create(new Group { Name = name, Capacity = capacity, EducationId = educationId, CreatedTime = DateTime.Now });
+            ConsoleColor.Green.WriteConsole("Created Successfully");
         }
         public async Task Delete()
         {
@@ -77,11 +128,18 @@ namespace EducationApp.Controllers
         }
         public async Task GetAllAsync()
         {
+            var eduDatas = await _educationService.GetAll();
             var datas = await _groupService.GetAllAsync();
             foreach (var item in datas)
             {
-                string data = $"Name : {item.Name}, Capasity : {item.Capacity}, Education : {item.Education.Name}";
-                Console.WriteLine(data);
+                foreach (var edu in eduDatas)
+                {
+                    if (item.EducationId == edu.Id)
+                    {
+                        string data = $"Name : {item.Name}, Capasity : {item.Capacity}, Education : {edu.Name}";
+                        Console.WriteLine(data);
+                    }
+                }
             }
         }
         public async Task GetByIdAsync()
@@ -90,9 +148,16 @@ namespace EducationApp.Controllers
             int id = Convert.ToInt32(Console.ReadLine());
             try
             {
+                var eduDatas = await _educationService.GetAll();
                 var data = await _groupService.GetById(id);
-                string result = $"Name : {data.Name}, Capasity : {data.Capacity}, Education : {data.Education.Name}";
-                Console.WriteLine(result);
+                foreach (var item in eduDatas)
+                {
+                    if (item.Id == data.EducationId)
+                    {
+                        string result = $"Name : {data.Name}, Capasity : {data.Capacity}, Education : {item.Name}";
+                        Console.WriteLine(result);
+                    }
+                }
             }
             catch (Exception ex)
             {
