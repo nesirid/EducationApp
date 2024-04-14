@@ -51,37 +51,52 @@ namespace EducationApp.Controllers
 
         public async Task Register()
         {
-            Console.WriteLine("Add Fullname:");
-            string fullname = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(fullname) || !fullname.All(char.IsLetter))
+            string fullname;
+            do
             {
-                ConsoleColor.Red.WriteConsole("Invalid fullname format. Please enter a valid fullname.");
-                return;
-            }
+                Console.WriteLine("Add Fullname:");
+                fullname = Console.ReadLine();
+                if (!await IsValidEnglishNameAsync(fullname))
+                {
+                    ConsoleColor.Red.WriteConsole("Invalid fullname format. Please enter a valid fullname.");
+                }
+            } while (!await IsValidEnglishNameAsync(fullname));
 
-            Console.WriteLine("Add Username:");
-            string username = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(username))
+            string username;
+            do
             {
-                ConsoleColor.Red.WriteConsole("Invalid username format. Please enter a valid username.");
-                return;
-            }
+                Console.WriteLine("Add Username:");
+                username = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(username) || !username.All(char.IsLetter) || username.Length < 2 || username.Length > 50)
+                {
+                    ConsoleColor.Red.WriteConsole("Invalid username format. Please enter a valid username.");
+                }
+            } while (string.IsNullOrWhiteSpace(username) || !username.All(char.IsLetter) || username.Length < 2 || username.Length > 50);
 
-            Console.WriteLine("Add Email:");
-            string email = Console.ReadLine();
-            if (!IsValidEmail(email))
-            {
-                ConsoleColor.Red.WriteConsole("Invalid email format. Please enter a valid email.");
-                return;
-            }
 
-            Console.WriteLine("Add Password:");
-            string password = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(password))
+            string email;
+            do
             {
-                ConsoleColor.Red.WriteConsole("Invalid password format. Please enter a valid password.");
-                return;
-            }
+                Console.WriteLine("Add Email:");
+                email = Console.ReadLine();
+                if (!IsValidEmail(email))
+                {
+                    ConsoleColor.Red.WriteConsole("Invalid email format. Please enter a valid email.");
+                }
+            } while (!IsValidEmail(email));
+
+
+            string password;
+            do
+            {
+                Console.WriteLine("Add Password:");
+                password = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(password) || password.Length < 6 || password.Length > 50 || !ContainsSpecialCharacters(password) || !ContainsDigits(password))
+                {
+                    ConsoleColor.Red.WriteConsole("Invalid password format. Please enter a valid password (at least 6 characters, including special characters and digits).");
+                }
+            } while (string.IsNullOrWhiteSpace(password) || password.Length < 6 || password.Length > 50 || !ContainsSpecialCharacters(password) || !ContainsDigits(password));
 
             User newUser = new User
             {
@@ -100,6 +115,47 @@ namespace EducationApp.Controllers
             string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
             return Regex.IsMatch(email, pattern);
         }
+        private async Task<bool> IsValidEnglishNameAsync(string str)
+        {
+            if (string.IsNullOrWhiteSpace(str) || str.Length < 2 || str.Length > 50)
+            {
+                return false;
+            }
+
+            foreach (char c in str)
+            {
+                if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' '))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        private bool ContainsSpecialCharacters(string str)
+        {
+            foreach (char c in str)
+            {
+                if (!char.IsLetterOrDigit(c) && !char.IsWhiteSpace(c))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool ContainsDigits(string str)
+        {
+            foreach (char c in str)
+            {
+                if (char.IsDigit(c))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 
     }
-}
+

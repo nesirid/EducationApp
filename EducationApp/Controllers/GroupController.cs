@@ -143,18 +143,10 @@ namespace EducationApp.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("Invalid input. Please enter 'YES' or 'NO'.");
+                    ConsoleColor.Red.WriteConsole("Invalid input. Please enter 'YES' or 'NO'.");
                 }
             } while (true);
-            //try
-            //{
-            //    await _groupService.Delete(id);
-            //    ConsoleColor.Green.WriteConsole("Data Deleted");
-            //}
-            //catch (Exception ex)
-            //{
-            //    ConsoleColor.Red.WriteConsole(ex.Message);
-            //}
+            
         }
         public async Task Update()
         {
