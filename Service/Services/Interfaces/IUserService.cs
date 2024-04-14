@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Models;
 
 namespace Service.Services.Interfaces
 {
-    internal interface IUserService
+    public interface IUserService
     {
+        Task Register(User user);
+        Task<bool> Login(User user);
 
     }
 }

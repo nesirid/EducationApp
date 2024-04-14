@@ -1,12 +1,6 @@
 ﻿using Service.Services.Interfaces;
 using Service.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Domain.Models;
-using System.Xml.Linq;
 
 namespace EducationApp.Controllers
 {

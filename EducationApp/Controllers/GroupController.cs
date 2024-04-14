@@ -1,8 +1,7 @@
 ﻿using Domain.Models;
+using Service.Helpers.Extentions;
 using Service.Services;
 using Service.Services.Interfaces;
-using System.Data;
-using System.Reflection.Emit;
 
 namespace EducationApp.Controllers
 {
@@ -28,6 +27,7 @@ namespace EducationApp.Controllers
 
 
             await _groupService.Create(new Group { Name = name, Capacity = capasity, EducationId = educationId, CreatedTime = DateTime.UtcNow });
+            ConsoleColor.Green.WriteConsole("Created Succesfully");       
         }
         public async Task Delete()
         {
@@ -36,11 +36,11 @@ namespace EducationApp.Controllers
             try
             {
                 await _groupService.Delete(id);
-                Console.WriteLine("Data Deleted");
+                ConsoleColor.Green.WriteConsole("Data Deleted");
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                ConsoleColor.Red.WriteConsole(ex.Message);
             }
         }
         public async Task Update()
@@ -68,10 +68,11 @@ namespace EducationApp.Controllers
                     EducationId = educationId
                 };
                 await _groupService.Update(updatedGroup);
+                ConsoleColor.Green.WriteConsole("Updated Succesfully");
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                ConsoleColor.Red.WriteConsole(ex.Message);
             }
         }
         public async Task GetAllAsync()
@@ -95,7 +96,7 @@ namespace EducationApp.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                ConsoleColor.Red.WriteConsole(ex.Message);
             }
 
         }
