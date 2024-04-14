@@ -4,6 +4,7 @@ using Domain.Models;
 using Repository.Data;
 using Service.Helpers.Extentions;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace EducationApp.Controllers
 {
@@ -34,20 +35,24 @@ namespace EducationApp.Controllers
                     goto Edu;
                 }
             }
-
+            
             Console.WriteLine("Add Education Color:");
             string eduColor = Console.ReadLine();
+            
 
             if (string.IsNullOrWhiteSpace(eduName) || !eduName.All(char.IsLetter)
                 || string.IsNullOrWhiteSpace(eduColor) || !eduColor.All(char.IsLetter))
             {
-                ConsoleColor.Red.WriteConsole("Education Name format is wrong!!!");
+                ConsoleColor.Red.WriteConsole("Education Color Name format is wrong!!!");
                 goto Edu;
             }
 
             _educationService.Create(new Education { Name = eduName, Color = eduColor, CreatedTime = DateTime.Now });
             ConsoleColor.Green.WriteConsole("Created Education Successfuly");
+            
         }
+
+
         public async Task Delete()
         {
             var eduDatas = _educationService.GetAllForMethods();
@@ -220,5 +225,11 @@ namespace EducationApp.Controllers
                 }
             }
         }
+        private bool IsValidName(string name)
+        {
+            return !string.IsNullOrWhiteSpace(name) && name.All(char.IsLetter);
+        }
+
     }
+
 }

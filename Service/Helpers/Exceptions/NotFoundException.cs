@@ -1,9 +1,9 @@
-﻿
-
-namespace Service.Helpers.Exceptions
+﻿namespace Service.Helpers.Exceptions
 {
-    internal class NotFoundException:Exception
+    internal class NotFoundException : Exception
     {
-        public NotFoundException(string msj) : base(msj) { }
+        public NotFoundException() : base("Not Found") { }
+
+        public NotFoundException(string message) : base(message) { }
     }
 }

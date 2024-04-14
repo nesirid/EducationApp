@@ -22,75 +22,89 @@ namespace EducationApp.Controllers
 
         public async Task Create()
         {
-        Group:
-            Console.WriteLine("Add Name:");
-            string name = Console.ReadLine();
-            var datas = await _groupService.GetAllAsync();
-            foreach (var item in datas)
-            {
-                if (item.Name == name)
-                {
-                    ConsoleColor.Red.WriteConsole("Already exist group name!!!");
-                    goto Group;
-                }
-            }
-            if (string.IsNullOrWhiteSpace(name) || !name.All(char.IsLetter))
-            {
-                ConsoleColor.Red.WriteConsole("Group Name format is wrong!!!");
-                goto Group;
-            }
-
+            string name;
             int capacity;
-            bool isValidCapacity = false;
-            do
-            {
-                Console.WriteLine("Add Capacity:");
-                string capacityInput = Console.ReadLine();
-
-                if (int.TryParse(capacityInput, out capacity))
-                {
-                    isValidCapacity = true;
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter a valid number for the capacity.");
-                }
-            } while (!isValidCapacity);
-
-            var eduDatas = _educationService.GetAllForMethods();
-            foreach (var item in eduDatas)
-            {
-                string data = $"Id : {item.Id}  Name : {item.Name}";
-                Console.WriteLine(data);
-            }
-
             int educationId;
-            bool isValidEducationId = false;
-            do
-            {
-                Console.WriteLine("Add Education Id:");
-                string educationIdInput = Console.ReadLine();
 
-                if (int.TryParse(educationIdInput, out educationId))
+            bool createAnotherGroup = true;
+
+            while (createAnotherGroup)
+            {
+                Console.WriteLine("Add Group Name:");
+                name = Console.ReadLine();
+
+                var datas = await _groupService.GetAllAsync();
+                if (datas.Any(item => item.Name == name))
                 {
-                    //var eduDatas = _educationService.GetAllForMethods();
-                    if (eduDatas.Any(edu => edu.Id == educationId))
+                    ConsoleColor.Red.WriteConsole("Group name already exists!");
+                    break;
+                }
+
+                if (string.IsNullOrWhiteSpace(name) || !name.All(char.IsLetter))
+                {
+                    ConsoleColor.Red.WriteConsole("Group Name format is wrong!");
+                    break;
+                }
+
+                bool isValidCapacity = false;
+                do
+                {
+                    Console.WriteLine("Add Group Capacity 1-18:");
+                    string capacityInput = Console.ReadLine();
+
+                    if (int.TryParse(capacityInput, out capacity))
                     {
-                        isValidEducationId = true;
+                        isValidCapacity = true;
                     }
                     else
                     {
-                        ConsoleColor.Red.WriteConsole("Invalid Education Id. Please enter an existing Education Id.");
+                        Console.WriteLine("Invalid input. Please enter a valid number for the capacity.");
                     }
-                }
-                else
-                {
-                    Console.WriteLine("Invalid input. Please enter a valid number for the Education Id.");
-                }
-            } while (!isValidEducationId);
+                } while (!isValidCapacity);
 
-            await _groupService.Create(new Group { Name = name, Capacity = capacity, EducationId = educationId, CreatedTime = DateTime.Now });
-            ConsoleColor.Green.WriteConsole("Created Successfully");
+                var eduDatas = _educationService.GetAllForMethods();
+                foreach (var item in eduDatas)
+                {
+                    string data = $"Id : {item.Id}  Name : {item.Name}";
+                    Console.WriteLine(data);
+                }
+
+                bool isValidEducationId = false;
+                do
+                {
+                    Console.WriteLine("Add Education Id: " );
+                    string educationIdInput = Console.ReadLine();
+
+                    if (int.TryParse(educationIdInput, out educationId))
+                    {
+                        if (eduDatas.Any(edu => edu.Id == educationId))
+                        {
+                            isValidEducationId = true;
+                        }
+                        else
+                        {
+                            ConsoleColor.Red.WriteConsole("Invalid Education Id. Please enter an existing Education Id.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input. Please enter a valid number for the Education Id.");
+                    }
+                } while (!isValidEducationId);
+
+                // CREATE GROUP
+                await _groupService.Create(new Group { Name = name, Capacity = capacity, EducationId = educationId, CreatedTime = DateTime.Now });
+                ConsoleColor.Green.WriteConsole("Created Successfully");
+
+                // ASK
+                Console.WriteLine("Do you want to create another group? (y/n)");
+                string response = Console.ReadLine();
+                createAnotherGroup = response.ToLower() == "y";
+                if (!createAnotherGroup)
+                {
+                    break;
+                }
+            }
         }
         public async Task Delete()
         {
@@ -106,7 +120,7 @@ namespace EducationApp.Controllers
             do
             {
 
-                Console.WriteLine("Enter Group Id:");
+                ConsoleColor.Yellow.WriteConsole("Enter Group Id:");
                 string idInput = Console.ReadLine();
 
                 if (int.TryParse(idInput, out groupId))
@@ -115,20 +129,20 @@ namespace EducationApp.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("Invalid input. Please enter a valid number for the ID.");
+                    ConsoleColor.Red.WriteConsole("Invalid input. Please enter a valid number for the ID.");
                 }
             } while (!isValidId);
             string confirmation;
             do
             {
-                Console.WriteLine("Are you sure you want to delete this group? (YES/NO)");
+                ConsoleColor.Yellow.WriteConsole("Are you sure you want to delete this group? (YES/NO)");
                 confirmation = Console.ReadLine().ToUpper();
                 if (confirmation == "YES")
                 {
                     try
                     {
                         await _groupService.Delete(groupId);
-                        Console.WriteLine("Data Deleted");
+                        ConsoleColor.Green.WriteConsole("Data Deleted");
                     }
                     catch (Exception ex)
                     {
@@ -138,7 +152,7 @@ namespace EducationApp.Controllers
                 }
                 else if (confirmation == "NO")
                 {
-                    Console.WriteLine("Deletion cancelled.");
+                    ConsoleColor.Red.WriteConsole("Deletion cancelled.");
                     break;
                 }
                 else
@@ -237,34 +251,7 @@ namespace EducationApp.Controllers
                     ConsoleColor.Red.WriteConsole(ex.Message);
                 }
             }
-            //Console.WriteLine("Enter Group Id:");
-            //int id = Convert.ToInt32(Console.ReadLine());
-            //try
-            //{
-            //    var data = await _groupService.GetById(id);
-            //    Console.WriteLine("Enter Name:");
-            //    string name = Console.ReadLine();
-
-            //    Console.WriteLine("Enter Capasity:");
-            //    int capasity = Convert.ToInt32(Console.ReadLine());
-
-            //    Console.WriteLine("Enter Education Id:");
-            //    int educationId = Convert.ToInt32(Console.ReadLine());
-
-            //    var updatedGroup = new Group
-            //    {
-            //        Id = data.Id,
-            //        Name = name,
-            //        Capacity = capasity,
-            //        EducationId = educationId
-            //    };
-            //    await _groupService.Update(updatedGroup);
-            //    ConsoleColor.Green.WriteConsole("Updated Succesfully");
-            //}
-            //catch (Exception ex)
-            //{
-            //    ConsoleColor.Red.WriteConsole(ex.Message);
-            //}
+            
         }
         public async Task GetAllAsync()
         {

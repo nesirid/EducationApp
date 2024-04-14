@@ -174,7 +174,7 @@ do
                 goto Operation;
             }
         }
-        //break;
+        
     }
     else
     {
@@ -187,27 +187,33 @@ do
 
 static void GetMenues()
 {
-    ConsoleColor.Cyan.WriteConsole("Choose one operation : " +
-        "\n EDUCATION MANAGEMENT" +
-        "\n 1 - Create Education" +
-        "\n 2 - Delete Education" +
-        "\n 3 - Update Education" +
-        "\n 4 - GetById Education" +
-        "\n 5 - Get All Education With Groups" +
-        "\n 6 - Search Education" +
-        "\n 7 - Sort Education With Created Date" +
-        "\n 8 - GetAll Education" +
-        "\n -----------------------------------------" +
-        "\n GROUP MANAGEMENT" +
-        "\n 9 - Create Groups" +
-        "\n 10 - Delete Groups" +
-        "\n 11 - Update Groups" +
-        "\n 12 - Get All Groups" +
-        "\n 13 - Get Groups By Id" +
-        "\n 14 - Search Groups" +
-        "\n 15 - Filter By Education Name" +
-        "\n 16 - Get All With Education Id" +
-        "\n 17 - Sort With Groups Capacity" 
-        );
+
+    ConsoleColor.Cyan.WriteConsole(@"
+╔════════════════════════════════════════════╗
+║            EDUCATION MANAGEMENT            ║
+╠════════════════════════════════════════════╣
+║  1 - Create Education                      ║
+║  2 - Delete Education                      ║
+║  3 - Update Education                      ║
+║  4 - GetById Education                     ║
+║  5 - Get All Education With Groups         ║
+║  6 - Search Education                      ║
+║  7 - Sort Education With Created Date      ║
+║  8 - GetAll Education                      ║
+║════════════════════════════════════════════║
+║              GROUPS MANAGEMENT             ║
+╠════════════════════════════════════════════╣
+║  9  - Create Groups                        ║
+║ 10 - Delete Groups                         ║
+║ 11 - Update Groups                         ║
+║ 12 - Get All Groups                        ║
+║ 13 - Get Groups By Id                      ║
+║ 14 - Search Groups                         ║
+║ 15 - Filter By Education Name              ║
+║ 16 - Get All With Education Id             ║
+║ 17 - Sort With Groups Capacity             ║
+╚════════════════════════════════════════════╝
+");
+
 }
 
