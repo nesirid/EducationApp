@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using Repository.Data;
 using Service.Helpers.Extentions;
 using Service.Services;
 using Service.Services.Interfaces;
@@ -9,11 +10,14 @@ namespace EducationApp.Controllers
     {
         private readonly IGroupService _groupService;
         private readonly IEducationService _educationService;
+        private readonly AppDbContext _context;
+
 
         public GroupController()
         {
             _groupService = new GroupService();
             _educationService = new EducationService();
+            _context = new AppDbContext();
         }
 
         public async Task Create()
@@ -98,10 +102,10 @@ namespace EducationApp.Controllers
             }
             int groupId;
             bool isValidId = false;
-            
+
             do
             {
-                
+
                 Console.WriteLine("Enter Group Id:");
                 string idInput = Console.ReadLine();
 
@@ -154,39 +158,126 @@ namespace EducationApp.Controllers
         }
         public async Task Update()
         {
-            Console.WriteLine("Enter Group Id:");
-            int id = Convert.ToInt32(Console.ReadLine());
-            try
+            var groupDatas = _groupService.GetAllForMethods();
+            foreach (var item in groupDatas)
             {
-                var data = await _groupService.GetById(id);
-                Console.WriteLine("Enter Name:");
-                string name = Console.ReadLine();
+                string data = $"Id : {item.Id}  Name : {item.Name}, Color : {item.Capacity}";
+                Console.WriteLine(data);
+            }
 
-                Console.WriteLine("Enter Capasity:");
-                int capasity = Convert.ToInt32(Console.ReadLine());
+            int id;
+            bool isValidId = false;
+            do
+            {
+                Console.WriteLine("Enter Group Id (a number):");
+                string idInput = Console.ReadLine();
 
-                Console.WriteLine("Enter Education Id:");
-                int educationId = Convert.ToInt32(Console.ReadLine());
 
-                var updatedGroup = new Group
+                if (int.TryParse(idInput, out id))
                 {
-                    Id = data.Id,
-                    Name = name,
-                    Capacity = capasity,
-                    EducationId = educationId
-                };
-                await _groupService.Update(updatedGroup);
-                ConsoleColor.Green.WriteConsole("Updated Succesfully");
-            }
-            catch (Exception ex)
+                    isValidId = true;
+                }
+                else
+                {
+                    ConsoleColor.Red.WriteConsole("Invalid input. Please enter a valid number for the ID.");
+                }
+            } while (!isValidId);
+            //int id = Convert.ToInt32(Console.ReadLine());
+
+            var existGro =  _context.Groups.FirstOrDefault(g => g.Id == id);
+            if (existGro == null)
             {
-                ConsoleColor.Red.WriteConsole(ex.Message);
+                ConsoleColor.Red.WriteConsole("Invalid input. Please enter a valid number for the ID.");
             }
+            else
+            {
+                try
+                {
+                    Console.WriteLine("Enter Name:");
+                    //string name = Console.ReadLine();
+                    string groName;
+                    bool isValidName = false;
+
+                    do
+                    {
+                       groName = Console.ReadLine();
+                        if (!string.IsNullOrWhiteSpace(groName))
+                        {
+                            isValidName = true;
+                        }
+                        else
+                        {
+                            ConsoleColor.Red.WriteConsole("Invalid input. Please enter a valid name.");
+                        }
+                    } while (!isValidName);
+
+                    Console.WriteLine("Enter Capasity:");
+                    int capacity;
+                    bool isValidCapacity = false;
+
+                    do
+                    {
+                        string capacityInput = Console.ReadLine();
+                        if (int.TryParse(capacityInput, out capacity))
+                        {
+                            isValidCapacity = true;
+                        }
+                        else
+                        {
+                            ConsoleColor.Red.WriteConsole("Invalid input. Please enter a valid number for the capacity.");
+                        }
+                    } while (!isValidCapacity);
+                    //int capasity = Convert.ToInt32(Console.ReadLine());
+                    bool isValid = false;
+
+                    Group newGroup = new Group
+                    {
+                        Name = groName,
+                        Capacity = capacity,
+                        CreatedTime = DateTime.Now,
+                    };
+
+                    await _groupService.Update(newGroup, id);
+                    ConsoleColor.Green.WriteConsole("Updated Succesfully");
+                }
+                catch (Exception ex)
+                {
+                    ConsoleColor.Red.WriteConsole(ex.Message);
+                }
+            }
+            //Console.WriteLine("Enter Group Id:");
+            //int id = Convert.ToInt32(Console.ReadLine());
+            //try
+            //{
+            //    var data = await _groupService.GetById(id);
+            //    Console.WriteLine("Enter Name:");
+            //    string name = Console.ReadLine();
+
+            //    Console.WriteLine("Enter Capasity:");
+            //    int capasity = Convert.ToInt32(Console.ReadLine());
+
+            //    Console.WriteLine("Enter Education Id:");
+            //    int educationId = Convert.ToInt32(Console.ReadLine());
+
+            //    var updatedGroup = new Group
+            //    {
+            //        Id = data.Id,
+            //        Name = name,
+            //        Capacity = capasity,
+            //        EducationId = educationId
+            //    };
+            //    await _groupService.Update(updatedGroup);
+            //    ConsoleColor.Green.WriteConsole("Updated Succesfully");
+            //}
+            //catch (Exception ex)
+            //{
+            //    ConsoleColor.Red.WriteConsole(ex.Message);
+            //}
         }
         public async Task GetAllAsync()
         {
             var eduDatas = _educationService.GetAllForMethods();
-            var datas =  _groupService.GetAllForMethods();
+            var datas = _groupService.GetAllForMethods();
             foreach (var item in datas)
             {
                 foreach (var edu in eduDatas)
@@ -211,7 +302,7 @@ namespace EducationApp.Controllers
                 {
                     if (item.Id == data.EducationId)
                     {
-                        string result = $"Id : {item.Id}, Name : {data.Name}, Capasity : {data.Capacity}, Education : {item.Name}";
+                        string result = $"Id : {data.Id}, Name : {data.Name}, Capasity : {data.Capacity}, Education : {item.Name}";
                         Console.WriteLine(result);
                     }
                 }

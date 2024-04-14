@@ -7,7 +7,7 @@ namespace Service.Services.Interfaces
     {
         Task Create(Group group);
         Task Delete(int? id);
-        Task Update(Group group);
+        Task Update(Group group,int id);
         Task<List<Group>> Search(string name);
         Task<Group> GetById(int id);
         Task<List<Group>> GetAllAsync();

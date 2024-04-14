@@ -12,10 +12,10 @@ namespace Service.Services
         {
             _context = new AppDbContext();
         }
-        public async Task<bool> Login(User user)
+        public bool Login(User user)
         {
             if (user == null) Console.WriteLine("User Not Found!!!");
-            User existUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == user.Username && u.Password == user.Password);
+            User existUser =  _context.Users.FirstOrDefault(u => u.Username == user.Username && u.Password == user.Password);
             if (existUser == null)
             {
                 return false;

@@ -6,107 +6,184 @@ EducationController educationController = new();
 GroupController groupController = new();
 UserController userController = new();
 
-//char choose;
-//do
-//{
-//    ConsoleColor.Yellow.WriteConsole("Do You Have Account? \n y / n");
-//    choose = Console.ReadKey().KeyChar;
-//    Console.WriteLine();
-
-//    if (choose == 'y')
-//    {
-//        Console.WriteLine("Login");
-//        userController.Login();
-
-//        break; 
-//    }
-//    else if (choose == 'n')
-//    {
-//        Console.WriteLine("Register");
-//        userController.Register();
-//        userController.Login();
-//        break; 
-//    }
-//    else
-//    {
-//        ConsoleColor.Red.WriteConsole("You have to choose 'y' or 'n'");
-//    }
-//} while (true);
-
-while (true)
+char choose;
+do
 {
-    GetMenues();
-Operation: string? operationStr = Console.ReadLine();
+    ConsoleColor.Yellow.WriteConsole("Do You Have Account? \n y / n");
+    choose = Console.ReadKey().KeyChar;
+    Console.WriteLine();
 
-    int operation;
-
-    bool isCorrectOperationFormat = int.TryParse(operationStr, out operation);
-    if (isCorrectOperationFormat)
+    if (choose == 'y')
     {
-        switch (operation)
+        Console.WriteLine("Login");
+        userController.Login();
+
+        while (true)
         {
-            case 1:
-                educationController.Create();
-                break;
-            case 2:
-                educationController.Delete();
-                break;
-            case 3:
-                educationController.Update();
-                break;
-            case 4:
-                educationController.GetById();
-                break;
-            case 5:
-                educationController.GetAllWithGroups();
-                break;
-            case 6:
-                educationController.Search();
-                break;
-            case 7:
-                educationController.SortWithCreatedDate();
-                break;
-            case 8:
-                educationController.GetAll();
-                break;
-            case 9:
-                groupController.Create();
-                break;
-            case 10:
-                groupController.Delete();
-                break;
-            case 11:
-                groupController.Update();
-                break;
-            case 12:
-                groupController.GetAllAsync();
-                break;
-            case 13:
-                groupController.GetByIdAsync();
-                break;
-            case 14:
-                groupController.Search();
-                break;
-            case 15:
-                groupController.FilterByEducationName();
-                break;
-            case 16:
-                groupController.GetAllWithEducationId();
-                break;
-            case 17:
-                groupController.SortWithCapacity();
-                break;
-            default:
-                ConsoleColor.Red.WriteConsole("You can choose 1-17!!!");
+            GetMenues();
+        Operation: string? operationStr = Console.ReadLine();
+
+            int operation;
+
+            bool isCorrectOperationFormat = int.TryParse(operationStr, out operation);
+            if (isCorrectOperationFormat)
+            {
+                switch (operation)
+                {
+                    case 1:
+                        educationController.Create();
+                        break;
+                    case 2:
+                        educationController.Delete();
+                        break;
+                    case 3:
+                        educationController.Update();
+                        break;
+                    case 4:
+                        educationController.GetById();
+                        break;
+                    case 5:
+                        educationController.GetAllWithGroups();
+                        break;
+                    case 6:
+                        educationController.Search();
+                        break;
+                    case 7:
+                        educationController.SortWithCreatedDate();
+                        break;
+                    case 8:
+                        educationController.GetAll();
+                        break;
+                    case 9:
+                        groupController.Create();
+                        break;
+                    case 10:
+                        groupController.Delete();
+                        break;
+                    case 11:
+                        groupController.Update();
+                        break;
+                    case 12:
+                        groupController.GetAllAsync();
+                        break;
+                    case 13:
+                        groupController.GetByIdAsync();
+                        break;
+                    case 14:
+                        groupController.Search();
+                        break;
+                    case 15:
+                        groupController.FilterByEducationName();
+                        break;
+                    case 16:
+                        groupController.GetAllWithEducationId();
+                        break;
+                    case 17:
+                        groupController.SortWithCapacity();
+                        break;
+                    default:
+                        ConsoleColor.Red.WriteConsole("You can choose 1-17!!!");
+                        goto Operation;
+                }
+            }
+            else
+            {
+                ConsoleColor.Red.WriteConsole("Operation format is wrong, please add operation again");
                 goto Operation;
+            }
         }
+
+        //break;
+    }
+    else if (choose == 'n')
+    {
+        Console.WriteLine("Register");
+        userController.Register();
+        userController.Login();
+        while (true)
+        {
+            GetMenues();
+        Operation: string? operationStr = Console.ReadLine();
+
+            int operation;
+
+            bool isCorrectOperationFormat = int.TryParse(operationStr, out operation);
+            if (isCorrectOperationFormat)
+            {
+                switch (operation)
+                {
+                    case 1:
+                        educationController.Create();
+                        break;
+                    case 2:
+                        educationController.Delete();
+                        break;
+                    case 3:
+                        educationController.Update();
+                        break;
+                    case 4:
+                        educationController.GetById();
+                        break;
+                    case 5:
+                        educationController.GetAllWithGroups();
+                        break;
+                    case 6:
+                        educationController.Search();
+                        break;
+                    case 7:
+                        educationController.SortWithCreatedDate();
+                        break;
+                    case 8:
+                        educationController.GetAll();
+                        break;
+                    case 9:
+                        groupController.Create();
+                        break;
+                    case 10:
+                        groupController.Delete();
+                        break;
+                    case 11:
+                        groupController.Update();
+                        break;
+                    case 12:
+                        groupController.GetAllAsync();
+                        break;
+                    case 13:
+                        groupController.GetByIdAsync();
+                        break;
+                    case 14:
+                        groupController.Search();
+                        break;
+                    case 15:
+                        groupController.FilterByEducationName();
+                        break;
+                    case 16:
+                        groupController.GetAllWithEducationId();
+                        break;
+                    case 17:
+                        groupController.SortWithCapacity();
+                        break;
+                    default:
+                        ConsoleColor.Red.WriteConsole("You can choose 1-17!!!");
+                        goto Operation;
+                }
+            }
+            else
+            {
+                ConsoleColor.Red.WriteConsole("Operation format is wrong, please add operation again");
+                goto Operation;
+            }
+        }
+        //break;
     }
     else
     {
-        ConsoleColor.Red.WriteConsole("Operation format is wrong, please add operation again");
-        goto Operation;
+        ConsoleColor.Red.WriteConsole("You have to choose 'y' or 'n'");
     }
-}
+} while (true);
+
+
+
 
 static void GetMenues()
 {

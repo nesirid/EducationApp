@@ -5,7 +5,7 @@ namespace Service.Services.Interfaces
     public interface IUserService
     {
         Task Register(User user);
-        Task<bool> Login(User user);
+        bool Login(User user);
 
     }
 }

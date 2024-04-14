@@ -61,14 +61,20 @@ namespace Service.Services
             return data;
         }
 
-        public async Task Update(Group group)
+        public async Task Update(Group group, int id)
         {
-            var data = _context.Groups.FirstOrDefault(g => g.Id == group.Id);
+            //var data = _context.Groups.FirstOrDefault(g => g.Id == group.Id);
+            //if (data is null) throw new ArgumentNullException("Data not found");
+            //data.Name = group.Name;
+            //data.Capacity = group.Capacity;
+            //data.EducationId = group.EducationId;
+            //data.Education = data.Education;
+            //await _context.SaveChangesAsync();
+            var data = await _context.Groups.FirstOrDefaultAsync(g => g.Id == id);
             if (data is null) throw new ArgumentNullException("Data not found");
             data.Name = group.Name;
             data.Capacity = group.Capacity;
-            data.EducationId = group.EducationId;
-            data.Education = data.Education;
+            data.CreatedTime = DateTime.Now;
             await _context.SaveChangesAsync();
         }
 
